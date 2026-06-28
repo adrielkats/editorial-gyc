@@ -1,10 +1,12 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import ProductForm from '@/components/ProductForm'
 import datosIniciales from '../../../../data/productos.json'
 
 const STORAGE_KEY = 'gyc-productos'
+const ADMIN_KEY = 'gyc-admin'
 
 function obtenerProductos() {
   const guardado = localStorage.getItem(STORAGE_KEY)
@@ -17,6 +19,16 @@ function guardarProductos(productos) {
 
 export default function NuevoProductoPage() {
   const router = useRouter()
+  const [autorizado, setAutorizado] = useState(null)
+
+  useEffect(() => {
+    const admin = localStorage.getItem(ADMIN_KEY) === 'true'
+    if (!admin) {
+      router.replace('/productos')
+    } else {
+      setAutorizado(true)
+    }
+  }, [router])
 
   function crearProducto(datos) {
     const productos = obtenerProductos()
@@ -26,6 +38,8 @@ export default function NuevoProductoPage() {
     guardarProductos(productos)
     router.push('/productos')
   }
+
+  if (!autorizado) return null
 
   return (
     <ProductForm

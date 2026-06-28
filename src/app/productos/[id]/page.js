@@ -6,6 +6,7 @@ import Link from 'next/link'
 import datosIniciales from '../../../../data/productos.json'
 
 const STORAGE_KEY = 'gyc-productos'
+const ADMIN_KEY = 'gyc-admin'
 
 function obtenerProductos() {
   const guardado = localStorage.getItem(STORAGE_KEY)
@@ -16,12 +17,14 @@ export default function DetalleProductoPage() {
   const { id } = useParams()
   const router = useRouter()
   const [producto, setProducto] = useState(null)
+  const [esAdmin, setEsAdmin] = useState(false)
   const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
     const productos = obtenerProductos()
     const encontrado = productos.find(p => p.id === Number(id))
     setProducto(encontrado || null)
+    setEsAdmin(localStorage.getItem(ADMIN_KEY) === 'true')
     setCargando(false)
   }, [id])
 
@@ -29,7 +32,13 @@ export default function DetalleProductoPage() {
     return '$' + Number(precio).toLocaleString('es-AR')
   }
 
-  if (cargando) return <p>Cargando...</p>
+  function enlaceWhatsApp() {
+    if (!producto) return '#'
+    const mensaje = `Hola! Quiero comprar: ${producto.nombre} - ${formatearPrecio(producto.precio)}%0a%0a${producto.descripcion}`
+    return `https://wa.me/3755213667?text=${mensaje}`
+  }
+
+  if (cargando) return <p className="vacio">Cargando...</p>
 
   if (!producto) {
     return (
@@ -42,11 +51,12 @@ export default function DetalleProductoPage() {
 
   return (
     <div className="detalle">
-      {producto.imagen && (
-        <img src={producto.imagen} alt={producto.nombre} />
-      )}
+      {producto.imagen && <img src={producto.imagen} alt={producto.nombre} />}
       <div className="detalle-body">
-        <h2>{producto.nombre}</h2>
+        <h2>
+          {producto.nombre}
+          {esAdmin && <span className="admin-badge">Admin</span>}
+        </h2>
         <p className="precio">{formatearPrecio(producto.precio)}</p>
         <p className="stock">
           Stock:{' '}
@@ -56,9 +66,14 @@ export default function DetalleProductoPage() {
         </p>
         <p className="descripcion">{producto.descripcion}</p>
         <div className="detalle-acciones">
-          <Link href={`/productos/${producto.id}/editar`} className="btn btn-naranja">
-            Editar
-          </Link>
+          <a href={enlaceWhatsApp()} target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp">
+            Comprar por WhatsApp
+          </a>
+          {esAdmin && (
+            <Link href={`/productos/${producto.id}/editar`} className="btn btn-naranja">
+              Editar
+            </Link>
+          )}
           <button className="btn btn-gris" onClick={() => router.back()}>
             Volver
           </button>

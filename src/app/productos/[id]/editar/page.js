@@ -6,6 +6,7 @@ import ProductForm from '@/components/ProductForm'
 import datosIniciales from '../../../../../data/productos.json'
 
 const STORAGE_KEY = 'gyc-productos'
+const ADMIN_KEY = 'gyc-admin'
 
 function obtenerProductos() {
   const guardado = localStorage.getItem(STORAGE_KEY)
@@ -20,14 +21,21 @@ export default function EditarProductoPage() {
   const { id } = useParams()
   const router = useRouter()
   const [producto, setProducto] = useState(null)
+  const [autorizado, setAutorizado] = useState(null)
   const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
+    const admin = localStorage.getItem(ADMIN_KEY) === 'true'
+    if (!admin) {
+      router.replace('/productos')
+      return
+    }
+    setAutorizado(true)
     const productos = obtenerProductos()
     const encontrado = productos.find(p => p.id === Number(id))
     setProducto(encontrado || null)
     setCargando(false)
-  }, [id])
+  }, [id, router])
 
   function actualizarProducto(datos) {
     const productos = obtenerProductos()
@@ -38,7 +46,7 @@ export default function EditarProductoPage() {
     router.push(`/productos/${id}`)
   }
 
-  if (cargando) return <p>Cargando...</p>
+  if (!autorizado || cargando) return null
 
   if (!producto) {
     return (
