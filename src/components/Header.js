@@ -20,9 +20,7 @@ export default function Header() {
   function iniciarSesion() {
     if (pass === ADMIN_PASS) {
       localStorage.setItem(ADMIN_KEY, 'true')
-      setEsAdmin(true)
-      setMostrarLogin(false)
-      setPass('')
+      window.location.reload()
     } else {
       alert('Contraseña incorrecta')
     }
@@ -30,7 +28,7 @@ export default function Header() {
 
   function cerrarSesion() {
     localStorage.removeItem(ADMIN_KEY)
-    setEsAdmin(false)
+    window.location.reload()
   }
 
   function activa(path) {
