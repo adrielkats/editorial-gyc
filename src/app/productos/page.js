@@ -2,49 +2,40 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import datosIniciales from '../../../data/productos.json'
 
-const STORAGE_KEY = 'gyc-productos'
 const ADMIN_KEY = 'gyc-admin'
-
-function cargarProductos() {
-  if (typeof window === 'undefined') return []
-  const guardado = localStorage.getItem(STORAGE_KEY)
-  if (guardado) return JSON.parse(guardado)
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(datosIniciales))
-  return datosIniciales
-}
-
-function guardarProductos(productos) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(productos))
-}
-
-function enlaceWhatsApp(producto) {
-  const url = typeof window !== 'undefined' ? window.location.origin : ''
-  const mensaje = `Hola! Quiero comprar: ${producto.nombre} - $${Number(producto.precio).toLocaleString('es-AR')}%0a%0aMás info: ${url}/productos/${producto.id}`
-  return `https://wa.me/3755213667?text=${mensaje}`
-}
 
 export default function ProductosPage() {
   const [productos, setProductos] = useState([])
   const [esAdmin, setEsAdmin] = useState(false)
   const [cargando, setCargando] = useState(true)
 
-  useEffect(() => {
-    setProductos(cargarProductos())
-    setEsAdmin(localStorage.getItem(ADMIN_KEY) === 'true')
+  async function cargarProductos() {
+    const res = await fetch('/api/productos')
+    const data = await res.json()
+    setProductos(data)
     setCargando(false)
+  }
+
+  useEffect(() => {
+    cargarProductos()
+    setEsAdmin(localStorage.getItem(ADMIN_KEY) === 'true')
   }, [])
 
-  function eliminar(id) {
+  async function eliminar(id) {
     if (!window.confirm('¿Eliminar este producto?')) return
-    const nuevos = productos.filter(p => p.id !== id)
-    setProductos(nuevos)
-    guardarProductos(nuevos)
+    await fetch(`/api/productos/${id}`, { method: 'DELETE' })
+    cargarProductos()
   }
 
   function formatearPrecio(precio) {
     return '$' + Number(precio).toLocaleString('es-AR')
+  }
+
+  function enlaceWhatsApp(producto) {
+    const url = typeof window !== 'undefined' ? window.location.origin : ''
+    const mensaje = `Hola! Quiero comprar: ${producto.nombre} - $${Number(producto.precio).toLocaleString('es-AR')}%0a%0aM%C3%A1s info: ${url}/productos/${producto.id}`
+    return `https://wa.me/3755213667?text=${mensaje}`
   }
 
   if (cargando) return <p className="vacio">Cargando...</p>
@@ -73,7 +64,6 @@ export default function ProductosPage() {
           )}
         </div>
       ) : esAdmin ? (
-        /* VISTA ADMIN: tabla con CRUD */
         <table className="productos-table">
           <thead>
             <tr>
@@ -105,7 +95,6 @@ export default function ProductosPage() {
           </tbody>
         </table>
       ) : (
-        /* VISTA COMPRADOR: tarjetas con WhatsApp */
         <div className="productos-grid">
           {productos.map(p => (
             <div className="producto-card" key={p.id}>
@@ -123,7 +112,7 @@ export default function ProductosPage() {
                 </p>
               </div>
               <div className="producto-card-acciones">
-                <Link href={`/productos/${p.id}`} className="btn btn-azul btn-sm">Ver más</Link>
+                <Link href={`/productos/${p.id}`} className="btn btn-azul btn-sm">Ver m&aacute;s</Link>
                 <a href={enlaceWhatsApp(p)} target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp btn-whatsapp-sm">
                   Comprar
                 </a>

@@ -3,58 +3,41 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import ProductForm from '@/components/ProductForm'
-import datosIniciales from '../../../../../data/productos.json'
 
-const STORAGE_KEY = 'gyc-productos'
 const ADMIN_KEY = 'gyc-admin'
-
-function obtenerProductos() {
-  const guardado = localStorage.getItem(STORAGE_KEY)
-  return guardado ? JSON.parse(guardado) : datosIniciales
-}
-
-function guardarProductos(productos) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(productos))
-}
 
 export default function EditarProductoPage() {
   const { id } = useParams()
   const router = useRouter()
   const [producto, setProducto] = useState(null)
   const [autorizado, setAutorizado] = useState(null)
-  const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
-    const admin = localStorage.getItem(ADMIN_KEY) === 'true'
-    if (!admin) {
+    if (localStorage.getItem(ADMIN_KEY) !== 'true') {
       router.replace('/productos')
       return
     }
     setAutorizado(true)
-    const productos = obtenerProductos()
-    const encontrado = productos.find(p => p.id === Number(id))
-    setProducto(encontrado || null)
-    setCargando(false)
+    async function cargar() {
+      const res = await fetch(`/api/productos/${id}`)
+      if (res.ok) {
+        setProducto(await res.json())
+      }
+    }
+    cargar()
   }, [id, router])
 
-  function actualizarProducto(datos) {
-    const productos = obtenerProductos()
-    const index = productos.findIndex(p => p.id === Number(id))
-    if (index === -1) return
-    productos[index] = { ...productos[index], ...datos }
-    guardarProductos(productos)
+  async function actualizarProducto(datos) {
+    await fetch(`/api/productos/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos),
+    })
     router.push(`/productos/${id}`)
   }
 
-  if (!autorizado || cargando) return null
-
-  if (!producto) {
-    return (
-      <div className="vacio">
-        <p>Producto no encontrado.</p>
-      </div>
-    )
-  }
+  if (!autorizado) return null
+  if (!producto) return null
 
   return (
     <ProductForm

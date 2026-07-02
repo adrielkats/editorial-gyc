@@ -3,15 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import datosIniciales from '../../../../data/productos.json'
 
-const STORAGE_KEY = 'gyc-productos'
 const ADMIN_KEY = 'gyc-admin'
-
-function obtenerProductos() {
-  const guardado = localStorage.getItem(STORAGE_KEY)
-  return guardado ? JSON.parse(guardado) : datosIniciales
-}
 
 export default function DetalleProductoPage() {
   const { id } = useParams()
@@ -21,11 +14,15 @@ export default function DetalleProductoPage() {
   const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
-    const productos = obtenerProductos()
-    const encontrado = productos.find(p => p.id === Number(id))
-    setProducto(encontrado || null)
-    setEsAdmin(localStorage.getItem(ADMIN_KEY) === 'true')
-    setCargando(false)
+    async function cargar() {
+      const res = await fetch(`/api/productos/${id}`)
+      if (res.ok) {
+        setProducto(await res.json())
+      }
+      setEsAdmin(localStorage.getItem(ADMIN_KEY) === 'true')
+      setCargando(false)
+    }
+    cargar()
   }, [id])
 
   function formatearPrecio(precio) {
