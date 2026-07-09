@@ -1,18 +1,20 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import ProductForm from '@/components/ProductForm'
 
 const ADMIN_KEY = 'gyc-admin'
 
-export default function NuevoProductoPage() {
+function NuevoForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const categoria = searchParams.get('categoria') || 'muebles'
   const [autorizado, setAutorizado] = useState(null)
 
   useEffect(() => {
     if (localStorage.getItem(ADMIN_KEY) !== 'true') {
-      router.replace('/productos')
+      router.replace('/')
     } else {
       setAutorizado(true)
     }
@@ -24,10 +26,18 @@ export default function NuevoProductoPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(datos),
     })
-    router.push('/productos')
+    router.push(`/${datos.categoria}`)
   }
 
   if (!autorizado) return null
 
-  return <ProductForm onSubmit={crearProducto} titulo="Nuevo producto" />
+  return <ProductForm productoInicial={{ categoria }} onSubmit={crearProducto} titulo="Nuevo producto" />
+}
+
+export default function NuevoProductoPage() {
+  return (
+    <Suspense>
+      <NuevoForm />
+    </Suspense>
+  )
 }

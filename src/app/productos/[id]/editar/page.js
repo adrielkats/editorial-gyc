@@ -14,15 +14,13 @@ export default function EditarProductoPage() {
 
   useEffect(() => {
     if (localStorage.getItem(ADMIN_KEY) !== 'true') {
-      router.replace('/productos')
+      router.replace('/')
       return
     }
     setAutorizado(true)
     async function cargar() {
       const res = await fetch(`/api/productos/${id}`)
-      if (res.ok) {
-        setProducto(await res.json())
-      }
+      if (res.ok) setProducto(await res.json())
     }
     cargar()
   }, [id, router])
@@ -33,7 +31,7 @@ export default function EditarProductoPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(datos),
     })
-    router.push(`/productos/${id}`)
+    router.push(`/${datos.categoria}`)
   }
 
   if (!autorizado) return null

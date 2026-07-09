@@ -7,6 +7,7 @@ export default function ProductForm({ productoInicial, onSubmit, titulo }) {
   const router = useRouter()
 
   const [form, setForm] = useState({
+    categoria: productoInicial?.categoria || 'muebles',
     nombre: productoInicial?.nombre || '',
     descripcion: productoInicial?.descripcion || '',
     precio: productoInicial?.precio || '',
@@ -36,6 +37,14 @@ export default function ProductForm({ productoInicial, onSubmit, titulo }) {
     <div className="form-container">
       <h2>{titulo || 'Producto'}</h2>
       <form onSubmit={manejarSubmit}>
+        <div className="form-group">
+          <label htmlFor="categoria">Categoría</label>
+          <select id="categoria" name="categoria" value={form.categoria} onChange={cambiar} style={{ width: '100%', padding: '0.6rem 0.8rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem', fontFamily: 'inherit' }}>
+            <option value="muebles">Muebles</option>
+            <option value="espejos">Espejos</option>
+            <option value="libros">Libros</option>
+          </select>
+        </div>
         <div className="form-group">
           <label htmlFor="nombre">Nombre del producto</label>
           <input

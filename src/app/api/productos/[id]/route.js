@@ -3,9 +3,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(request, { params }) {
   const { id } = await params
-  const producto = await prisma.producto.findUnique({
-    where: { id: Number(id) },
-  })
+  const producto = await prisma.producto.findUnique({ where: { id: Number(id) } })
   if (!producto) {
     return NextResponse.json({ error: 'No encontrado' }, { status: 404 })
   }
@@ -18,6 +16,7 @@ export async function PUT(request, { params }) {
   const producto = await prisma.producto.update({
     where: { id: Number(id) },
     data: {
+      categoria: body.categoria || undefined,
       nombre: body.nombre,
       descripcion: body.descripcion || '',
       precio: Number(body.precio) || 0,

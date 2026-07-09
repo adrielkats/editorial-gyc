@@ -16,23 +16,17 @@ export default function DetalleProductoPage() {
   useEffect(() => {
     async function cargar() {
       const res = await fetch(`/api/productos/${id}`)
-      if (res.ok) {
-        setProducto(await res.json())
-      }
+      if (res.ok) setProducto(await res.json())
       setEsAdmin(localStorage.getItem(ADMIN_KEY) === 'true')
       setCargando(false)
     }
     cargar()
   }, [id])
 
-  function formatearPrecio(precio) {
-    return '$' + Number(precio).toLocaleString('es-AR')
-  }
-
   function enlaceWhatsApp() {
     if (!producto) return '#'
-    const mensaje = `Hola! Quiero comprar: ${producto.nombre} - ${formatearPrecio(producto.precio)}%0a%0a${producto.descripcion}`
-    return `https://wa.me/3755213667?text=${mensaje}`
+    const msg = `Hola! Quiero comprar: ${producto.nombre}%0a%0a${producto.descripcion}`
+    return `https://wa.me/3755213667?text=${msg}`
   }
 
   if (cargando) return <p className="vacio">Cargando...</p>
@@ -41,7 +35,7 @@ export default function DetalleProductoPage() {
     return (
       <div className="vacio">
         <p>Producto no encontrado.</p>
-        <Link href="/productos" className="btn btn-azul">Volver a productos</Link>
+        <Link href="/" className="btn btn-azul">Volver al inicio</Link>
       </div>
     )
   }
@@ -54,17 +48,19 @@ export default function DetalleProductoPage() {
           {producto.nombre}
           {esAdmin && <span className="admin-badge">Admin</span>}
         </h2>
-        <p className="precio">{formatearPrecio(producto.precio)}</p>
-        <p className="stock">
-          Stock:{' '}
-          <span style={{ color: producto.stock > 5 ? '#27ae60' : producto.stock > 0 ? '#e67e22' : '#e74c3c', fontWeight: 600 }}>
-            {producto.stock} {producto.stock === 1 ? 'unidad' : 'unidades'}
-          </span>
-        </p>
-        <p className="descripcion">{producto.descripcion}</p>
+        <p className="descripcion" style={{ fontSize: '1.1rem', margin: '1rem 0', color: '#444' }}>{producto.descripcion}</p>
+
+        {esAdmin && (
+          <div style={{ background: '#f8f8ff', padding: '1rem', borderRadius: '8px', margin: '1rem 0' }}>
+            <p><strong>Precio:</strong> ${Number(producto.precio).toLocaleString('es-AR')}</p>
+            <p><strong>Stock:</strong> {producto.stock} unidades</p>
+            <p><strong>Categoría:</strong> {producto.categoria}</p>
+          </div>
+        )}
+
         <div className="detalle-acciones">
           <a href={enlaceWhatsApp()} target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp">
-            Comprar por WhatsApp
+            Consultar por WhatsApp
           </a>
           {esAdmin && (
             <Link href={`/productos/${producto.id}/editar`} className="btn btn-naranja">

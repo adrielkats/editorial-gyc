@@ -9,6 +9,7 @@ datasource db {
 
 model Producto {
   id          Int    @id @default(autoincrement())
+  categoria   String @default("muebles")
   nombre      String
   descripcion String @default("")
   precio      Float  @default(0)
