@@ -12,7 +12,7 @@ export default function Home() {
         </div>
         <div className="hero-content">
           <div className="hero-logo">
-            <h1>Editorial G&amp;C</h1>
+            <h1>MuebleG&amp;C</h1>
             <p className="hero-slogan">Calidad y diseño para tu hogar</p>
           </div>
         </div>
@@ -23,7 +23,7 @@ export default function Home() {
         <div className="about-inner">
           <h2>Sobre nosotros</h2>
           <p>
-            En <strong>Editorial G&amp;C</strong> nos dedicamos a la fabricación y
+            En <strong>MuebleG&amp;C</strong> nos dedicamos a la fabricación y
             comercialización de muebles, espejos y libros con los más altos estándares
             de calidad. Trabajamos artesanalmente cada pieza para brindar productos
             únicos que transforman tus espacios.

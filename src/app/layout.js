@@ -2,8 +2,8 @@ import './globals.css'
 import Header from '@/components/Header'
 
 export const metadata = {
-  title: 'Editorial G&C - Muebles',
-  description: 'Catálogo de muebles con stock y descripciones',
+  title: 'MuebleG&C',
+  description: 'Muebles, espejos y libros de calidad',
 }
 
 export default function RootLayout({ children }) {

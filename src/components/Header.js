@@ -39,7 +39,7 @@ export default function Header() {
     <header className="header">
       <div className="header-inner">
         <div className="header-logo">
-          <span>Editorial G&amp;C</span>
+          <span>MuebleG&amp;C</span>
         </div>
         <nav className="header-nav">
           <Link href="/" className={ruta === '/' ? 'active' : ''}>Inicio</Link>
