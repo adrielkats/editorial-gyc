@@ -12,11 +12,16 @@ function imgUrl(imagen) {
 }
 
 export default async function Home() {
-  const destacados = await prisma.producto.findMany({
-    where: { visible: true, categoria: 'muebles' },
-    orderBy: { id: 'asc' },
-    take: 5,
-  })
+  let destacados = []
+  try {
+    destacados = await prisma.producto.findMany({
+      where: { visible: true, categoria: 'muebles' },
+      orderBy: { id: 'asc' },
+      take: 5,
+    })
+  } catch {
+    destacados = []
+  }
 
   return (
     <div>

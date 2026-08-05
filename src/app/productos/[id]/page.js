@@ -14,17 +14,36 @@ function imgUrl(imagen, width = 800) {
 }
 
 export async function generateStaticParams() {
-  const productos = await prisma.producto.findMany({ where: { visible: true }, select: { id: true } })
-  return productos.map(p => ({ id: String(p.id) }))
+  try {
+    const productos = await prisma.producto.findMany({ where: { visible: true }, select: { id: true } })
+    return productos.map(p => ({ id: String(p.id) }))
+  } catch {
+    return []
+  }
 }
 
 export default async function DetalleProductoPage({ params }) {
   const { id } = await params
   const numId = Number(id)
 
-  const producto = await prisma.producto.findUnique({ where: { id: numId } })
+  let producto = null
+  let relacionados = []
+  try {
+    producto = await prisma.producto.findUnique({ where: { id: numId } })
+    if (producto?.visible) {
+      relacionados = await prisma.producto.findMany({
+        where: { visible: true, categoria: producto.categoria, id: { not: numId } },
+        take: 4,
+        orderBy: { id: 'asc' },
+      })
+    } else {
+      producto = null
+    }
+  } catch {
+    producto = null
+  }
 
-  if (!producto || !producto.visible) {
+  if (!producto) {
     return (
       <div className="vacio">
         <p>Producto no encontrado.</p>
@@ -32,12 +51,6 @@ export default async function DetalleProductoPage({ params }) {
       </div>
     )
   }
-
-  const relacionados = await prisma.producto.findMany({
-    where: { visible: true, categoria: producto.categoria, id: { not: numId } },
-    take: 4,
-    orderBy: { id: 'asc' },
-  })
 
   const cat = producto.categoria || 'muebles'
   const etiqueta = ETIQUETAS[cat] || cat
