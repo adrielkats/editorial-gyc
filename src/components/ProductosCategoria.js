@@ -9,11 +9,19 @@ export default function ProductosCategoria({ categoria, titulo, descripcion }) {
   const [productos, setProductos] = useState([])
   const [esAdmin, setEsAdmin] = useState(false)
   const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState(false)
 
   async function cargar() {
-    const res = await fetch(`/api/productos?categoria=${categoria}`)
-    setProductos(await res.json())
-    setEsAdmin(localStorage.getItem(ADMIN_KEY) === 'true')
+    setCargando(true)
+    setError(false)
+    try {
+      const res = await fetch(`/api/productos?categoria=${categoria}`)
+      if (res.ok) setProductos(await res.json())
+      else setError(true)
+    } catch {
+      setError(true)
+    }
+    setEsAdmin(!!localStorage.getItem(ADMIN_KEY))
     setCargando(false)
   }
 
@@ -21,17 +29,29 @@ export default function ProductosCategoria({ categoria, titulo, descripcion }) {
 
   async function eliminar(id) {
     if (!window.confirm('¿Eliminar este producto?')) return
-    await fetch(`/api/productos/${id}`, { method: 'DELETE' })
+    const clave = localStorage.getItem(ADMIN_KEY) || ''
+    await fetch(`/api/productos/${id}`, { method: 'DELETE', headers: { 'x-admin-key': clave } })
     cargar()
   }
 
-  function whatsAppLink(p) {
-    const url = typeof window !== 'undefined' ? window.location.origin : ''
-    const msg = `Hola! Quiero comprar: ${p.nombre}%0a%0a${p.descripcion}%0a%0aM%C3%A1s info: ${url}/${categoria}/${p.id}`
-    return `https://wa.me/3755213667?text=${msg}`
+  function imgUrl(p) {
+    if (!p.imagen) return ''
+    if (p.imagen.includes('res.cloudinary.com')) {
+      return p.imagen.replace('/image/upload/', '/image/upload/w_400,f_auto,q_80/')
+    }
+    return p.imagen
   }
 
-  if (cargando) return <p className="vacio">Cargando...</p>
+  if (cargando) return <p className="vacio" role="status">Cargando...</p>
+
+  if (error) {
+    return (
+      <div className="vacio">
+        <p>No pudimos cargar los productos. Revisá tu conexión.</p>
+        <button className="btn btn-azul" onClick={cargar}>Reintentar</button>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -50,34 +70,25 @@ export default function ProductosCategoria({ categoria, titulo, descripcion }) {
 
       {productos.length === 0 ? (
         <div className="vacio">
-          <p>No hay productos en esta categoría todavía.</p>
+          <p>Estamos cargando esta categoría. ¡Próximamente!</p>
+          <a href="https://wa.me/3755213667?text=Hola!%20Quiero%20consultar%20por%20un%20producto." target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp btn-whatsapp-sm">Consultar por WhatsApp</a>
         </div>
       ) : (
         <div className="categoria-grid">
           {productos.map(p => (
             <div className="producto-card" key={p.id}>
-              {p.imagen && <img src={p.imagen} alt={p.nombre} />}
-              <div className="producto-card-body">
-                <h3>{p.nombre}</h3>
-                <p className="categoria-desc-corta">{p.descripcion}</p>
-                {esAdmin && (
-                  <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#555' }}>
-                    <p><strong>Precio:</strong> ${Number(p.precio).toLocaleString('es-AR')}</p>
-                    <p><strong>Stock:</strong> {p.stock} unidades</p>
-                  </div>
-                )}
-              </div>
-              <div className="producto-card-acciones">
-                <a href={whatsAppLink(p)} target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp">
-                  Consultar por WhatsApp
-                </a>
-                {esAdmin && (
-                  <>
-                    <Link href={`/productos/${p.id}/editar`} className="btn btn-naranja btn-sm">Editar</Link>
-                    <button className="btn btn-rojo btn-sm" onClick={() => eliminar(p.id)}>Eliminar</button>
-                  </>
-                )}
-              </div>
+              <Link href={`/productos/${p.id}`}>
+                {p.imagen && <img src={imgUrl(p)} alt={p.nombre} className="producto-card-img" loading="lazy" />}
+                <div className="producto-card-body">
+                  <h3>{p.nombre}</h3>
+                </div>
+              </Link>
+              {esAdmin && (
+                <div className="producto-card-acciones">
+                  <Link href={`/productos/${p.id}/editar`} className="btn btn-naranja btn-sm">Editar</Link>
+                  <button className="btn btn-rojo btn-sm" onClick={() => eliminar(p.id)}>Eliminar</button>
+                </div>
+              )}
             </div>
           ))}
         </div>

@@ -13,7 +13,7 @@ export default function EditarProductoPage() {
   const [autorizado, setAutorizado] = useState(null)
 
   useEffect(() => {
-    if (localStorage.getItem(ADMIN_KEY) !== 'true') {
+    if (!localStorage.getItem(ADMIN_KEY)) {
       router.replace('/')
       return
     }
@@ -26,9 +26,10 @@ export default function EditarProductoPage() {
   }, [id, router])
 
   async function actualizarProducto(datos) {
+    const clave = localStorage.getItem(ADMIN_KEY) || ''
     await fetch(`/api/productos/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-admin-key': clave },
       body: JSON.stringify(datos),
     })
     router.push(`/${datos.categoria}`)

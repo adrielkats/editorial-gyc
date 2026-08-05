@@ -13,7 +13,7 @@ function NuevoForm() {
   const [autorizado, setAutorizado] = useState(null)
 
   useEffect(() => {
-    if (localStorage.getItem(ADMIN_KEY) !== 'true') {
+    if (!localStorage.getItem(ADMIN_KEY)) {
       router.replace('/')
     } else {
       setAutorizado(true)
@@ -21,9 +21,10 @@ function NuevoForm() {
   }, [router])
 
   async function crearProducto(datos) {
+    const clave = localStorage.getItem(ADMIN_KEY) || ''
     await fetch('/api/productos', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-admin-key': clave },
       body: JSON.stringify(datos),
     })
     router.push(`/${datos.categoria}`)

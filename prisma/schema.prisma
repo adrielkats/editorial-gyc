@@ -15,4 +15,5 @@ model Producto {
   precio      Float  @default(0)
   stock       Int    @default(0)
   imagen      String @default("")
+  visible     Boolean @default(true)
 }
