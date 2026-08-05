@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import ProductForm from '@/components/ProductForm'
 
-const ADMIN_KEY = 'gyc-admin'
-
 export default function EditarProductoPage() {
   const { id } = useParams()
   const router = useRouter()
@@ -13,30 +11,28 @@ export default function EditarProductoPage() {
   const [autorizado, setAutorizado] = useState(null)
 
   useEffect(() => {
-    if (!localStorage.getItem(ADMIN_KEY)) {
-      router.replace('/')
-      return
-    }
-    setAutorizado(true)
-    async function cargar() {
-      const res = await fetch(`/api/productos/${id}`)
-      if (res.ok) setProducto(await res.json())
-    }
-    cargar()
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(d => {
+        if (!d.admin) { router.replace('/'); return }
+        setAutorizado(true)
+        fetch(`/api/productos/${id}`)
+          .then(r => r.ok ? r.json() : null)
+          .then(setProducto)
+      })
+      .catch(() => router.replace('/'))
   }, [id, router])
 
   async function actualizarProducto(datos) {
-    const clave = localStorage.getItem(ADMIN_KEY) || ''
     await fetch(`/api/productos/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'x-admin-key': clave },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(datos),
     })
     router.push(`/${datos.categoria}`)
   }
 
-  if (!autorizado) return null
-  if (!producto) return null
+  if (!autorizado || !producto) return null
 
   return (
     <ProductForm

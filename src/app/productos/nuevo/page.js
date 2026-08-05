@@ -4,8 +4,6 @@ import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import ProductForm from '@/components/ProductForm'
 
-const ADMIN_KEY = 'gyc-admin'
-
 function NuevoForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -13,18 +11,19 @@ function NuevoForm() {
   const [autorizado, setAutorizado] = useState(null)
 
   useEffect(() => {
-    if (!localStorage.getItem(ADMIN_KEY)) {
-      router.replace('/')
-    } else {
-      setAutorizado(true)
-    }
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(d => {
+        if (!d.admin) router.replace('/')
+        else setAutorizado(true)
+      })
+      .catch(() => router.replace('/'))
   }, [router])
 
   async function crearProducto(datos) {
-    const clave = localStorage.getItem(ADMIN_KEY) || ''
     await fetch('/api/productos', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-key': clave },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(datos),
     })
     router.push(`/${datos.categoria}`)

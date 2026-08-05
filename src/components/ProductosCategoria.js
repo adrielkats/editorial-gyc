@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
-const ADMIN_KEY = 'gyc-admin'
-
 export default function ProductosCategoria({ categoria, titulo, descripcion }) {
   const [productos, setProductos] = useState([])
   const [esAdmin, setEsAdmin] = useState(false)
@@ -21,7 +19,13 @@ export default function ProductosCategoria({ categoria, titulo, descripcion }) {
     } catch {
       setError(true)
     }
-    setEsAdmin(!!localStorage.getItem(ADMIN_KEY))
+    try {
+      const adminRes = await fetch('/api/auth/me')
+      const d = await adminRes.json()
+      setEsAdmin(d.admin)
+    } catch {
+      setEsAdmin(false)
+    }
     setCargando(false)
   }
 
@@ -29,8 +33,7 @@ export default function ProductosCategoria({ categoria, titulo, descripcion }) {
 
   async function eliminar(id) {
     if (!window.confirm('¿Eliminar este producto?')) return
-    const clave = localStorage.getItem(ADMIN_KEY) || ''
-    await fetch(`/api/productos/${id}`, { method: 'DELETE', headers: { 'x-admin-key': clave } })
+    await fetch(`/api/productos/${id}`, { method: 'DELETE' })
     cargar()
   }
 

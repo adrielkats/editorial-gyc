@@ -1,12 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import cloudinary from '@/lib/cloudinary'
-
-const ADMIN_PASS = 'Adriel2018'
-
-function esAdmin(request) {
-  return request.headers.get('x-admin-key') === ADMIN_PASS
-}
+import { isAdmin } from '@/lib/auth'
 
 async function subirCloudinary(base64) {
   if (!base64 || !base64.startsWith('data:')) return base64
@@ -24,7 +19,7 @@ export async function GET(request, { params }) {
 }
 
 export async function PUT(request, { params }) {
-  if (!esAdmin(request)) {
+  if (!isAdmin(request)) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
   const { id } = await params
@@ -45,7 +40,7 @@ export async function PUT(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
-  if (!esAdmin(request)) {
+  if (!isAdmin(request)) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
   const { id } = await params

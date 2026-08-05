@@ -7,7 +7,10 @@ export default function AdminControls({ productoId }) {
   const [esAdmin, setEsAdmin] = useState(false)
 
   useEffect(() => {
-    setEsAdmin(!!localStorage.getItem('gyc-admin'))
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(d => setEsAdmin(d.admin))
+      .catch(() => setEsAdmin(false))
   }, [])
 
   if (!esAdmin) return null
