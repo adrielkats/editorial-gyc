@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 
-const WHATSAPP = '3755213667'
+const WHATSAPP = '5493764376384'
 
 function imgUrl(imagen) {
   if (!imagen) return ''

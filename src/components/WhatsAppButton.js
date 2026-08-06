@@ -14,7 +14,7 @@ export default function WhatsAppButton({ producto }) {
   )
   return (
     <a
-      href={`https://wa.me/3755213667?text=${msg}`}
+      href={`https://wa.me/5493764376384?text=${msg}`}
       target="_blank"
       rel="noopener noreferrer"
       className="btn-whatsapp-detalle"

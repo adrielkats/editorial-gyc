@@ -74,7 +74,7 @@ export default function ProductosCategoria({ categoria, titulo, descripcion }) {
       {productos.length === 0 ? (
         <div className="vacio">
           <p>Estamos cargando esta categoría. ¡Próximamente!</p>
-          <a href="https://wa.me/3755213667?text=Hola!%20Quiero%20consultar%20por%20un%20producto." target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp btn-whatsapp-sm">Consultar por WhatsApp</a>
+          <a href="https://wa.me/5493764376384?text=Hola!%20Quiero%20consultar%20por%20un%20producto." target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp btn-whatsapp-sm">Consultar por WhatsApp</a>
         </div>
       ) : (
         <div className="categoria-grid">

@@ -60,7 +60,7 @@ export default function ProductGridClient({ productos: productosIniciales, categ
       {productos.length === 0 ? (
         <div className="vacio">
           <p>Estamos cargando esta categoría. ¡Próximamente!</p>
-          <a href="https://wa.me/3755213667?text=Hola!%20Quiero%20consultar%20por%20un%20producto." target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp btn-whatsapp-sm">Consultar por WhatsApp</a>
+          <a href="https://wa.me/5493764376384?text=Hola!%20Quiero%20consultar%20por%20un%20producto." target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp btn-whatsapp-sm">Consultar por WhatsApp</a>
         </div>
       ) : (
         <>
@@ -89,7 +89,7 @@ export default function ProductGridClient({ productos: productosIniciales, categ
                 </Link>
                 <div className="producto-card-bottom">
                   <a
-                    href={`https://wa.me/3755213667?text=${whatsappMsg(p)}`}
+                    href={`https://wa.me/5493764376384?text=${whatsappMsg(p)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="producto-card-whatsapp"
