@@ -29,7 +29,8 @@ export default function Header() {
     <header className="header">
       <div className="header-inner">
         <Link href="/" className="header-logo">
-          <span>MuebleG&amp;C</span>
+          <img src="/LogoGyCArg.png" alt="MuebleG&C" className="header-logo-img" />
+          <span className="header-brand">MuebleG&C</span>
         </Link>
         <nav className="header-nav" aria-label="Secciones">
           <Link href="/" className={ruta === '/' ? 'active' : ''}>Inicio</Link>

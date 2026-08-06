@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import ProductGridClient from '@/components/ProductGridClient'
+import FilterSidebar from '@/components/FilterSidebar'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,5 +10,10 @@ export default async function LibrosPage() {
     orderBy: { id: 'asc' },
   })
 
-  return <ProductGridClient productos={productos} categoria="libros" />
+  return (
+    <div className="catalog-layout">
+      <FilterSidebar />
+      <ProductGridClient productos={productos} categoria="libros" />
+    </div>
+  )
 }
