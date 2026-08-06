@@ -1,11 +1,13 @@
-import ProductosCategoria from '@/components/ProductosCategoria'
+import { prisma } from '@/lib/prisma'
+import ProductGridClient from '@/components/ProductGridClient'
 
-export default function LibrosPage() {
-  return (
-    <ProductosCategoria
-      categoria="libros"
-      titulo="Libros"
-      descripcion="Literatura, conocimiento y cultura. Descubrí nuestra colección de libros."
-    />
-  )
+export const dynamic = 'force-dynamic'
+
+export default async function LibrosPage() {
+  const productos = await prisma.producto.findMany({
+    where: { visible: true, categoria: 'libros' },
+    orderBy: { id: 'asc' },
+  })
+
+  return <ProductGridClient productos={productos} categoria="libros" />
 }

@@ -1,11 +1,13 @@
-import ProductosCategoria from '@/components/ProductosCategoria'
+import { prisma } from '@/lib/prisma'
+import ProductGridClient from '@/components/ProductGridClient'
 
-export default function MueblesPage() {
-  return (
-    <ProductosCategoria
-      categoria="muebles"
-      titulo="Muebles"
-      descripcion="Encontrá la mejor selección de muebles para tu hogar. Calidad y diseño en cada pieza."
-    />
-  )
+export const dynamic = 'force-dynamic'
+
+export default async function MueblesPage() {
+  const productos = await prisma.producto.findMany({
+    where: { visible: true, categoria: 'muebles' },
+    orderBy: { id: 'asc' },
+  })
+
+  return <ProductGridClient productos={productos} categoria="muebles" />
 }

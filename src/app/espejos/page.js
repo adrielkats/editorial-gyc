@@ -1,11 +1,13 @@
-import ProductosCategoria from '@/components/ProductosCategoria'
+import { prisma } from '@/lib/prisma'
+import ProductGridClient from '@/components/ProductGridClient'
 
-export default function EspejosPage() {
-  return (
-    <ProductosCategoria
-      categoria="espejos"
-      titulo="Espejos"
-      descripcion="Espejos de todos los estilos y tamaños. Elegancia que transforma tus espacios."
-    />
-  )
+export const dynamic = 'force-dynamic'
+
+export default async function EspejosPage() {
+  const productos = await prisma.producto.findMany({
+    where: { visible: true, categoria: 'espejos' },
+    orderBy: { id: 'asc' },
+  })
+
+  return <ProductGridClient productos={productos} categoria="espejos" />
 }
