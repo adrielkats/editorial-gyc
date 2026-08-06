@@ -94,7 +94,7 @@ export default async function Home() {
                 <line x1="8" y1="22" x2="16" y2="22" />
               </svg>
             </div>
-            <h3>Espejos <span className="proximamente">Próximamente</span></h3>
+            <h3>Espejos</h3>
             <p>Todos los estilos y tamaños. Pronto disponible.</p>
             <span className="sector-btn">Ver espejos</span>
           </Link>
