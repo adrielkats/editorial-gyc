@@ -3,12 +3,19 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
-const ADMIN_KEY = 'gyc-admin'
-const MAX_ANCHO = 400
+const MAX_ANCHO = 1200
+
+function esBase64(str) {
+  return str && str.startsWith('data:')
+}
 
 export default function ProductForm({ productoInicial, onSubmit, titulo }) {
   const router = useRouter()
   const fileInputRef = useRef(null)
+
+  const iniciales = Array.isArray(productoInicial?.imagenes) && productoInicial.imagenes.length > 0
+    ? productoInicial.imagenes.filter(Boolean)
+    : (productoInicial?.imagen ? [productoInicial.imagen] : [])
 
   const [form, setForm] = useState({
     categoria: productoInicial?.categoria || 'muebles',
@@ -16,8 +23,10 @@ export default function ProductForm({ productoInicial, onSubmit, titulo }) {
     descripcion: productoInicial?.descripcion || '',
     precio: productoInicial?.precio || '',
     stock: productoInicial?.stock || '',
-    imagen: productoInicial?.imagen || ''
+    imagenes: iniciales
   })
+  const [urlNueva, setUrlNueva] = useState('')
+  const [guardando, setGuardando] = useState(false)
 
   function cambiar(e) {
     const { name, value } = e.target
@@ -38,44 +47,72 @@ export default function ProductForm({ productoInicial, onSubmit, titulo }) {
         canvas.height = height
         const ctx = canvas.getContext('2d')
         ctx.drawImage(img, 0, 0, width, height)
-        resolve(canvas.toDataURL('image/jpeg', 0.7))
+        resolve(canvas.toDataURL('image/jpeg', 0.8))
       }
       img.src = URL.createObjectURL(archivo)
     })
   }
 
-  function manejarArchivo(e) {
-    const archivo = e.target.files?.[0]
-    if (!archivo) return
-    if (archivo.size > 5 * 1024 * 1024) {
-      alert('La imagen es muy grande. Máximo 5MB.')
-      return
+  async function manejarArchivos(e) {
+    const archivos = Array.from(e.target.files || [])
+    if (archivos.length === 0) return
+    const nuevos = []
+    for (const archivo of archivos) {
+      if (archivo.size > 5 * 1024 * 1024) {
+        alert(`La imagen "${archivo.name}" es muy grande. Máximo 5MB.`)
+        continue
+      }
+      nuevos.push(await redimensionar(archivo, MAX_ANCHO))
     }
-    redimensionar(archivo, MAX_ANCHO).then(dataUrl => {
-      setForm(prev => ({ ...prev, imagen: dataUrl }))
-    })
-  }
-
-  function quitarImagen() {
-    setForm(prev => ({ ...prev, imagen: '' }))
+    setForm(prev => ({ ...prev, imagenes: [...prev.imagenes, ...nuevos].filter(Boolean).slice(0, 15) }))
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
-  function manejarSubmit(e) {
+  function agregarUrl(e) {
     e.preventDefault()
+    const url = urlNueva.trim()
+    if (!url) return
+    if (!/^https?:\/\//i.test(url)) {
+      alert('Pegá una URL válida que empiece con http:// o https://')
+      return
+    }
+    setForm(prev => ({ ...prev, imagenes: [...prev.imagenes, url].slice(0, 15) }))
+    setUrlNueva('')
+  }
+
+  function quitarImagen(idx) {
+    setForm(prev => ({ ...prev, imagenes: prev.imagenes.filter((_, i) => i !== idx) }))
+  }
+
+  function hacerPortada(idx) {
+    setForm(prev => {
+      const imagenes = [...prev.imagenes]
+      const [imagen] = imagenes.splice(idx, 1)
+      return { ...prev, imagenes: [imagen, ...imagenes] }
+    })
+  }
+
+  async function manejarSubmit(e) {
+    e.preventDefault()
+    if (guardando) return
     if (!form.nombre.trim()) {
       alert('El nombre del producto es obligatorio')
       return
     }
-    onSubmit({
-      ...form,
-      precio: Number(form.precio) || 0,
-      stock: Number(form.stock) || 0
-    })
-  }
-
-  function esBase64(str) {
-    return str && str.startsWith('data:')
+    setGuardando(true)
+    try {
+      await onSubmit({
+        categoria: form.categoria,
+        nombre: form.nombre,
+        descripcion: form.descripcion,
+        precio: Number(form.precio) || 0,
+        stock: Number(form.stock) || 0,
+        imagenes: form.imagenes,
+        imagen: form.imagenes[0] || ''
+      })
+    } finally {
+      setGuardando(false)
+    }
   }
 
   return (
@@ -138,42 +175,59 @@ export default function ProductForm({ productoInicial, onSubmit, titulo }) {
         </div>
 
         <div className="form-group">
-          <label>Imagen del producto</label>
+          <label>Fotos del producto ({form.imagenes.length})</label>
           <div className="imagen-upload-area">
             <input
               ref={fileInputRef}
               type="file"
               accept="image/*"
-              onChange={manejarArchivo}
+              multiple
+              onChange={manejarArchivos}
               style={{ display: 'none' }}
               id="file-input"
             />
             <button type="button" className="btn btn-azul" onClick={() => fileInputRef.current?.click()}>
-              Seleccionar imagen
+              Subir fotos
             </button>
-            <span style={{ marginLeft: '0.5rem', color: '#666', fontSize: '0.85rem' }}>o pegá una URL</span>
+            <span style={{ marginLeft: '0.5rem', color: '#666', fontSize: '0.85rem' }}>
+              La primera foto es la portada de la grilla. Podés subir varias a la vez.
+            </span>
           </div>
-          {form.imagen && (
-            <div className="imagen-preview">
-              <img src={form.imagen} alt="Vista previa" />
-              <button type="button" className="btn btn-rojo btn-sm" onClick={quitarImagen} style={{ marginTop: '0.5rem' }}>Quitar imagen</button>
+
+          <div className="form-group" style={{ marginTop: '0.6rem', marginBottom: '0' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
+              <input
+                value={urlNueva}
+                onChange={e => setUrlNueva(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') agregarUrl(e) }}
+                placeholder="https://ejemplo.com/imagen.jpg"
+                style={{ flex: 1 }}
+              />
+              <button type="button" className="btn btn-gris btn-sm" style={{ whiteSpace: 'nowrap' }} onClick={agregarUrl}>Agregar URL</button>
             </div>
-          )}
-          {!esBase64(form.imagen) && (
-            <input
-              id="imagen"
-              name="imagen"
-              value={form.imagen}
-              onChange={cambiar}
-              placeholder="https://ejemplo.com/imagen.jpg"
-              style={{ marginTop: '0.5rem' }}
-            />
+          </div>
+
+          {form.imagenes.length > 0 && (
+            <div className="imagenes-preview">
+              {form.imagenes.map((imagen, idx) => (
+                <div key={idx} className="imagen-preview-item">
+                  <img src={imagen} alt={`Vista previa ${idx + 1}`} />
+                  {idx === 0 && <span className="imagen-portada-badge">Portada</span>}
+                  <div className="imagen-preview-acciones">
+                    {idx !== 0 && (
+                      <button type="button" className="btn btn-naranja btn-sm" onClick={() => hacerPortada(idx)}>Hacer portada</button>
+                    )}
+                    <button type="button" className="btn btn-rojo btn-sm" onClick={() => quitarImagen(idx)}>Quitar</button>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
 
         <div className="form-acciones">
-          <button type="submit" className="btn btn-verde">
-            {productoInicial ? 'Guardar cambios' : 'Crear producto'}
+          <button type="submit" className="btn btn-verde" disabled={guardando}>
+            {guardando ? 'Guardando...' : (productoInicial ? 'Guardar cambios' : 'Crear producto')}
           </button>
           <button type="button" className="btn btn-gris" onClick={() => router.back()}>
             Cancelar

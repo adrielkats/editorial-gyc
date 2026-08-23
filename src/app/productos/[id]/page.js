@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import AdminControls from './AdminControls'
 import WhatsAppButton from '@/components/WhatsAppButton'
+import ProductGallery from '@/components/ProductGallery'
 
 const ETIQUETAS = { muebles: 'Muebles', espejos: 'Espejos', libros: 'Libros' }
 
@@ -11,6 +12,24 @@ function imgUrl(imagen, width = 800) {
     return imagen.replace('/image/upload/', `/image/upload/w_${width},f_auto,q_80/`)
   }
   return imagen
+}
+
+function imgVariantes(imagen) {
+  if (!imagen) return null
+  if (imagen.includes('res.cloudinary.com')) {
+    return {
+      grande: imagen.replace('/image/upload/', '/image/upload/w_1200,f_auto,q_80/'),
+      miniatura: imagen.replace('/image/upload/', '/image/upload/w_200,f_auto,q_80/'),
+    }
+  }
+  return { grande: imagen, miniatura: imagen }
+}
+
+function galeriaDe(producto) {
+  const lista = Array.isArray(producto.imagenes) && producto.imagenes.length > 0
+    ? producto.imagenes.filter(Boolean)
+    : (producto.imagen ? [producto.imagen] : [])
+  return lista.map(imgVariantes).filter(Boolean)
 }
 
 export async function generateStaticParams() {
@@ -69,9 +88,7 @@ export default async function DetalleProductoPage({ params }) {
 
       <div className="detalle-layout">
         <div className="detalle-imagen">
-          {producto.imagen && (
-            <img src={imgUrl(producto.imagen)} alt={producto.nombre} />
-          )}
+          <ProductGallery fotos={galeriaDe(producto)} nombre={producto.nombre} />
         </div>
 
         <div className="detalle-info">

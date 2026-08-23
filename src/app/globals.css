@@ -568,6 +568,12 @@ a {
   font-size: 0.8rem;
 }
 
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* TARJETAS COMPACTAS (destacados, relacionados) */
 .producto-card {
   background: white;
@@ -895,6 +901,44 @@ a {
   object-fit: cover;
 }
 
+/* IMAGENES MULTIPLES (form) */
+.imagenes-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.imagen-preview-item {
+  position: relative;
+}
+
+.imagen-preview-item img {
+  width: 120px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.imagen-portada-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: rgba(39, 174, 96, 0.92);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+.imagen-preview-acciones {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+}
+
 /* DETALLE PRODUCTO */
 .detalle-page {
   /* wrapper for the whole detail section */
@@ -924,6 +968,63 @@ a {
   height: 100%;
   max-height: 500px;
   object-fit: contain;
+}
+
+/* GALERIA PRODUCTO */
+.galeria {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  width: 100%;
+}
+
+.galeria-imagen-principal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 380px;
+}
+
+.galeria-imagen-principal img {
+  width: 100%;
+  height: 100%;
+  max-height: 500px;
+  object-fit: contain;
+}
+
+.galeria-miniaturas {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.galeria-miniatura {
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #eee;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+
+.galeria-miniatura img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.galeria-miniatura:hover {
+  border-color: #ccc;
+}
+
+.galeria-miniatura.activa {
+  border-color: var(--madera);
 }
 
 .detalle-info {
@@ -1382,6 +1483,10 @@ a {
   .detalle-imagen {
     min-height: 300px;
     padding: 1rem;
+  }
+
+  .galeria-imagen-principal {
+    min-height: 280px;
   }
 
   .detalle-info {

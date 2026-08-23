@@ -1,13 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import cloudinary from '@/lib/cloudinary'
 import { isAdmin } from '@/lib/auth'
-
-async function subirCloudinary(base64) {
-  if (!base64 || !base64.startsWith('data:')) return base64
-  const result = await cloudinary.uploader.upload(base64, { folder: 'mueblegyc' })
-  return result.secure_url
-}
+import { normalizarImagenes } from '@/lib/imagenes'
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url)
@@ -24,7 +18,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
   const body = await request.json()
-  const imagen = await subirCloudinary(body.imagen)
+  const urls = await normalizarImagenes(body.imagenes, body.imagen)
   const producto = await prisma.producto.create({
     data: {
       categoria: body.categoria || 'muebles',
@@ -32,7 +26,8 @@ export async function POST(request) {
       descripcion: body.descripcion || '',
       precio: Number(body.precio) || 0,
       stock: Number(body.stock) || 0,
-      imagen,
+      imagen: urls[0] || '',
+      imagenes: urls,
     },
   })
   return NextResponse.json(producto, { status: 201 })

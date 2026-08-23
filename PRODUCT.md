@@ -24,7 +24,7 @@ Catálogo liviano orientado a la venta informal por WhatsApp, sin carrito ni pag
 
 ## Operating Context
 
-- WhatsApp de venta: 3755213667 (unico canal de contacto/compra).
+- WhatsApp de venta: +54 9 3764 37-6384 (unico canal de contacto/compra).
 - Categorías: muebles, espejos y libros. Hoy cargados: 26 productos de muebles con imagen; espejos y libros todavía sin cargar.
 - Contenido administrable desde un panel admin (modal con contraseña) que permite alta/edición/borrado de productos e imagen.
 
