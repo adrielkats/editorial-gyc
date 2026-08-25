@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma'
 import ProductGridClient from '@/components/ProductGridClient'
 import FilterSidebar from '@/components/FilterSidebar'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 3600
 
 export default async function ElectrodomesticosPage() {
   const productos = await prisma.producto.findMany({

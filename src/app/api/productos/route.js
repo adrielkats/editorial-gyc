@@ -2,6 +2,15 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { isAdmin } from '@/lib/auth'
 import { normalizarImagenes } from '@/lib/imagenes'
+import { revalidatePath } from 'next/cache'
+
+const CATEGORIAS = ['muebles', 'espejos', 'libros', 'electrodomesticos']
+
+function revalidarCatalogo() {
+  revalidatePath('/')
+  revalidatePath('/productos')
+  for (const c of CATEGORIAS) revalidatePath(`/${c}`)
+}
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url)
@@ -30,5 +39,6 @@ export async function POST(request) {
       imagenes: urls,
     },
   })
+  revalidarCatalogo()
   return NextResponse.json(producto, { status: 201 })
 }
