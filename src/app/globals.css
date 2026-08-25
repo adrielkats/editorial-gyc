@@ -318,6 +318,63 @@ a {
   border-top: 4px solid #DAA520;
 }
 
+.sector-electrodomesticos {
+  border-top: 4px solid #2C3E50;
+}
+
+/* BUSCADOR DE CATEGORIA */
+.busqueda-box {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.busqueda-box input[type="search"] {
+  width: 100%;
+  padding: 0.7rem 2.4rem 0.7rem 2.6rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: white;
+}
+
+.busqueda-box input[type="search"]:focus {
+  outline: none;
+  border-color: var(--madera);
+  box-shadow: 0 0 0 3px rgba(26,26,46,0.1);
+}
+
+.busqueda-icono {
+  position: absolute;
+  left: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  pointer-events: none;
+}
+
+.busqueda-limpiar {
+  position: absolute;
+  right: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  line-height: 1;
+}
+
+.busqueda-limpiar:hover {
+  color: var(--madera);
+}
+
+.busqueda-box input[type="search"]::-webkit-search-cancel-button {
+  display: none;
+}
+
 /* CATEGORIA PAGES */
 .catalog-layout {
   display: grid;

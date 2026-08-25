@@ -37,6 +37,7 @@ export default function Header() {
           <Link href="/muebles" className={activa('/muebles')}>Muebles</Link>
           <Link href="/espejos" className={activa('/espejos')}>Espejos</Link>
           <Link href="/libros" className={activa('/libros')}>Libros</Link>
+          <Link href="/electrodomesticos" className={activa('/electrodomesticos')}>Electrodomésticos</Link>
           {esAdmin ? (
             <button className="btn-admin" onClick={cerrarSesion}>Salir</button>
           ) : (

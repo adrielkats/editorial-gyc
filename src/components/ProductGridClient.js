@@ -1,18 +1,47 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 
 const PAGE_SIZE = 12
+
+const TITULOS = {
+  muebles: 'Muebles',
+  espejos: 'Espejos',
+  libros: 'Libros',
+  electrodomesticos: 'Electrodomésticos',
+}
+
+function quitarAcentos(str) {
+  return String(str || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+}
 
 export default function ProductGridClient({ productos: productosIniciales, categoria }) {
   const [productos] = useState(productosIniciales)
   const [esAdmin, setEsAdmin] = useState(false)
   const [pagina, setPagina] = useState(1)
+  const [busqueda, setBusqueda] = useState('')
 
-  const totalPaginas = Math.ceil(productos.length / PAGE_SIZE)
+  const titulo = TITULOS[categoria] || categoria
+
+  const filtrados = useMemo(() => {
+    const q = quitarAcentos(busqueda).trim()
+    if (!q) return productos
+    const palabras = q.split(/\s+/).filter(Boolean)
+    return productos.filter(p => {
+      const nombre = quitarAcentos(p.nombre)
+      const desc = quitarAcentos(p.descripcion)
+      return palabras.every(pal => nombre.includes(pal) || desc.includes(pal))
+    })
+  }, [busqueda, productos])
+
+  const totalPaginas = Math.ceil(filtrados.length / PAGE_SIZE)
   const inicio = (pagina - 1) * PAGE_SIZE
-  const paginaActual = productos.slice(inicio, inicio + PAGE_SIZE)
+  const paginaActual = filtrados.slice(inicio, inicio + PAGE_SIZE)
+  const buscando = busqueda.trim().length > 0
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -20,6 +49,11 @@ export default function ProductGridClient({ productos: productosIniciales, categ
       .then(d => setEsAdmin(d.admin))
       .catch(() => setEsAdmin(false))
   }, [])
+
+  function cambiarBusqueda(e) {
+    setBusqueda(e.target.value)
+    setPagina(1)
+  }
 
   async function eliminar(id) {
     if (!window.confirm('¿Eliminar este producto?')) return
@@ -41,14 +75,21 @@ export default function ProductGridClient({ productos: productosIniciales, categ
     )
   }
 
-  const titulo = categoria === 'muebles' ? 'Muebles' : categoria === 'espejos' ? 'Espejos' : 'Libros'
-
   return (
     <div>
       <div className="categoria-header">
         <div>
           <h2>{titulo}</h2>
-          <p className="categoria-count">{productos.length} producto{productos.length !== 1 ? 's' : ''} {esAdmin && <span className="admin-badge">Admin</span>}</p>
+          <p className="categoria-count">
+            {buscando ? (
+              <>
+                {filtrados.length} de {productos.length} producto{productos.length !== 1 ? 's' : ''} encontrado{filtrados.length !== 1 ? 's' : ''}
+              </>
+            ) : (
+              <>{productos.length} producto{productos.length !== 1 ? 's' : ''}</>
+            )}
+            {' '}{esAdmin && <span className="admin-badge">Admin</span>}
+          </p>
         </div>
         {esAdmin && (
           <Link href={`/productos/nuevo?categoria=${categoria}`} className="btn btn-verde">
@@ -57,10 +98,45 @@ export default function ProductGridClient({ productos: productosIniciales, categ
         )}
       </div>
 
+      <div className="busqueda-box">
+        <svg className="busqueda-icono" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="search"
+          value={busqueda}
+          onChange={cambiarBusqueda}
+          placeholder={`Buscar en ${titulo.toLowerCase()} (ej: Biblia)...`}
+          aria-label={`Buscar en ${titulo}`}
+        />
+        {busqueda && (
+          <button
+            type="button"
+            className="busqueda-limpiar"
+            onClick={() => { setBusqueda(''); setPagina(1) }}
+            aria-label="Limpiar búsqueda"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+
       {productos.length === 0 ? (
         <div className="vacio">
-          <p>Estamos cargando esta categoría. ¡Próximamente!</p>
+          <p>No hay productos en esta categoría todavía.</p>
           <a href="https://wa.me/5493764376384?text=Hola!%20Quiero%20consultar%20por%20un%20producto." target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp btn-whatsapp-sm">Consultar por WhatsApp</a>
+        </div>
+      ) : buscando && filtrados.length === 0 ? (
+        <div className="vacio">
+          <p>No encontramos productos para &ldquo;{busqueda}&rdquo;.</p>
+          <button
+            type="button"
+            className="btn btn-gris"
+            onClick={() => { setBusqueda(''); setPagina(1) }}
+          >
+            Borrar búsqueda
+          </button>
         </div>
       ) : (
         <>

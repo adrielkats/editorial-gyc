@@ -125,6 +125,7 @@ export default function ProductForm({ productoInicial, onSubmit, titulo }) {
             <option value="muebles">Muebles</option>
             <option value="espejos">Espejos</option>
             <option value="libros">Libros</option>
+            <option value="electrodomesticos">Electrodomésticos</option>
           </select>
         </div>
         <div className="form-group">

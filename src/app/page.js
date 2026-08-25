@@ -106,9 +106,20 @@ export default async function Home() {
                 <line x1="12" y1="5" x2="12" y2="19" />
               </svg>
             </div>
-            <h3>Libros <span className="proximamente">Próximamente</span></h3>
-            <p>Literatura y cultura. Pronto disponible.</p>
+            <h3>Libros</h3>
+            <p>Literatura y cultura.</p>
             <span className="sector-btn">Ver libros</span>
+          </Link>
+
+          <Link href="/electrodomesticos" className="sector-card sector-electrodomesticos">
+            <div className="sector-icon" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg>
+            </div>
+            <h3>Electrodomésticos</h3>
+            <p>Electrodomésticos para tu hogar.</p>
+            <span className="sector-btn">Ver electrodomésticos</span>
           </Link>
         </div>
       </section>

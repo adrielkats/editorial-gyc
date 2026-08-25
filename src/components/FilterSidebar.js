@@ -1,14 +1,29 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
+
 export default function FilterSidebar() {
+  const ruta = usePathname()
+
+  const categorias = [
+    { slug: 'muebles', nombre: 'Muebles' },
+    { slug: 'espejos', nombre: 'Espejos' },
+    { slug: 'libros', nombre: 'Libros' },
+    { slug: 'electrodomesticos', nombre: 'Electrodomésticos' },
+  ]
+
   return (
     <aside className="filter-sidebar">
       <div className="filter-block">
         <h3 className="filter-title">Categorías</h3>
         <ul className="filter-list">
-          <li><a href="/muebles" className="filter-link active">Muebles</a></li>
-          <li><a href="/espejos" className="filter-link">Espejos</a></li>
-          <li><a href="/libros" className="filter-link">Libros</a></li>
+          {categorias.map(c => (
+            <li key={c.slug}>
+              <a href={`/${c.slug}`} className={ruta.startsWith(`/${c.slug}`) ? 'filter-link active' : 'filter-link'}>
+                {c.nombre}
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
 
