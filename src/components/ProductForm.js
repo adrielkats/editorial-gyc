@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import SalirAdmin from '@/components/SalirAdmin'
 
 const MAX_ANCHO = 1200
 
@@ -233,6 +234,7 @@ export default function ProductForm({ productoInicial, onSubmit, titulo }) {
           <button type="button" className="btn btn-gris" onClick={() => router.back()}>
             Cancelar
           </button>
+          <SalirAdmin className="btn btn-gris" />
         </div>
       </form>
     </div>

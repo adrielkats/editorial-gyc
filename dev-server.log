@@ -1,0 +1,25 @@
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.100.99:3000
+- Environments: .env.local, .env
+✓ Ready in 2.5s
+
+ GET / 200 in 3.9s (next.js: 1015ms, application-code: 2.9s)
+ GET /api/auth/me 200 in 339ms (next.js: 286ms, application-code: 53ms)
+ GET / 200 in 3.1s (next.js: 15ms, application-code: 3.1s)
+ GET / 200 in 184ms (next.js: 15ms, application-code: 169ms)
+ GET / 200 in 197ms (next.js: 15ms, application-code: 182ms)
+ GET /muebles 200 in 423ms (next.js: 92ms, application-code: 331ms)
+ GET /muebles 200 in 149ms (next.js: 13ms, application-code: 137ms)
+ GET / 200 in 308ms (next.js: 18ms, application-code: 291ms)
+ GET /api/auth/me 200 in 34ms (next.js: 11ms, application-code: 22ms)
+ GET / 200 in 719ms (next.js: 18ms, application-code: 701ms)
+ GET /api/auth/me 200 in 25ms (next.js: 10ms, application-code: 16ms)
+ GET / 200 in 2.5s (next.js: 51ms, application-code: 2.5s)
+ GET / 200 in 2.8s (next.js: 146ms, application-code: 2.7s)
+ GET / 200 in 412ms (next.js: 139ms, application-code: 273ms)
+ GET / 200 in 248ms (next.js: 16ms, application-code: 232ms)
+ GET / 200 in 856ms (next.js: 13ms, application-code: 843ms)
+[?25h
+
+C:\Users\adrie\OneDrive\Desktop\Muebles\editorial-gyc>

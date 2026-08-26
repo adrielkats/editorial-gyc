@@ -1,24 +1,25 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
+import ProductosDestacados from '@/components/ProductosDestacados'
 
 const WHATSAPP = '5493764376384'
 
-function imgUrl(imagen) {
-  if (!imagen) return ''
-  if (imagen.includes('res.cloudinary.com')) {
-    return imagen.replace('/image/upload/', '/image/upload/w_400,f_auto,q_80/')
-  }
-  return imagen
-}
+const SECTORES = ['muebles', 'espejos', 'libros', 'electrodomesticos']
 
 export default async function Home() {
   let destacados = []
   try {
-    destacados = await prisma.producto.findMany({
-      where: { visible: true, categoria: 'muebles' },
-      orderBy: { id: 'asc' },
-      take: 5,
-    })
+    const grupos = await Promise.all(
+      SECTORES.map(async cat => {
+        const productos = await prisma.producto.findMany({
+          where: { visible: true, categoria: cat },
+          select: { id: true, nombre: true, imagen: true },
+          orderBy: { id: 'asc' },
+        })
+        return { slug: cat, productos }
+      })
+    )
+    destacados = grupos.filter(g => g.productos.length > 0)
   } catch {
     destacados = []
   }
@@ -49,16 +50,7 @@ export default async function Home() {
             <h2>Productos destacados</h2>
             <Link href="/muebles" className="destacados-ver-todos">Ver todos &rarr;</Link>
           </div>
-          <div className="destacados-grid">
-            {destacados.map(p => (
-              <Link href={`/productos/${p.id}`} className="producto-card" key={p.id}>
-                {p.imagen && <img src={imgUrl(p.imagen)} alt={p.nombre} className="producto-card-img" loading="lazy" />}
-                <div className="producto-card-body">
-                  <h3>{p.nombre}</h3>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <ProductosDestacados grupos={destacados} />
         </section>
       )}
 

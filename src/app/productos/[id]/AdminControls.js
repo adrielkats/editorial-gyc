@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import SalirAdmin from '@/components/SalirAdmin'
 
 export default function AdminControls({ productoId }) {
   const [esAdmin, setEsAdmin] = useState(false)
@@ -19,6 +20,7 @@ export default function AdminControls({ productoId }) {
     <>
       <span className="admin-badge">Admin</span>
       <Link href={`/productos/${productoId}/editar`} className="btn btn-naranja btn-sm">Editar</Link>
+      <SalirAdmin />
     </>
   )
 }
